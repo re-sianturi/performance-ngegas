@@ -142,7 +142,7 @@ Note: Section names di `section/` fleksibel per offer — nggak hardcode. Ngikut
 
 | Item | Status | Action |
 |------|--------|--------|
-| `schema-08-qa.json` | Belum dibuat | Direference di pipeline.yaml, perlu dibikin |
+| `schema-08-qa.json` | **Sudah dibuat** | Validasi 7 checks, auto-fail conditions, scoring 0.0-1.0 |
 | GitHub repo | **Sudah dipush** | `github.com/re-sianturi/performance-ngegas` |
 
 ---
