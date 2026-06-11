@@ -12,7 +12,16 @@
 
 ## File yang Diubah
 
-### 1. `schemas/schema-08.json` (rewrite)
+### 1. `SKILL.md` (patch multi-lokasi)
+Sync skill manifest dengan pipeline.yaml v1.0.4:
+- **Overview list** — Tambah step 08-qa (Persuasion Completeness QA Gate) di antara 08 dan 09
+- **DAG diagram** — Update: `07 CRO → 08 LP → 08-qa QA Gate → 09 QA Final`
+- **Artifact-First table** — Step 08 output diupdate: `08-lp/primary/` + `08-lp/challenger/` (multi-file), no `js/`, no `primary.html`/`challenger.html` fallback
+- **Folder structure** — Fix duplikasi `08-lp/` jadi struktur benar: `primary/` + `challenger/` masing-masing punya `index.html`, `section/*.html`, `img/`, `style.css`. Plus `qa-report.json` di root `08-lp/`
+- **Step-by-step chain** — Tambah `08-qa ← 08-lp/ + 07-cro/cro-plan.json` dan `09 ← semua artifact 01-08 + 08-lp/qa-report.json`
+- **LP Builder Pitfalls** — Pitfall 28: remove `js/` dari "Output HARUS multi-file", tambah "**NO js/ folder. No JS files.**"
+
+### 2. `schemas/schema-08.json` (rewrite)
 - Dari: `file_path: string` (1 file per variant)
 - Ke: `files: array` dengan multi-file support
 - Field baru:
@@ -25,7 +34,7 @@
   - `metadata.cro_plan_reference` — path ke CRO Plan yang dipakai (wajib)
 - `assets[].asset_type` — enum diupdate: image, video, copy, icon, form, css (script dihapus)
 
-### 2. `prompts/08-landing-page-builder.md` (rewrite total)
+### 3. `prompts/08-landing-page-builder.md` (rewrite total)
 - Role baru:
   - Direct Response Copywriter
   - Behavioral Economist
@@ -56,7 +65,7 @@
   - "So what?" test, answer user's question at that moment, use user's language, benefits > features, specific CTAs
 - HTML requirements: HTML5, Tailwind CSS CDN, mobile-responsive, lazy loading, no JS, CSS allowed
 
-### 3. `pipeline.yaml` (patch)
+### 4. `pipeline.yaml` (patch)
 - Step 08 output diubah:
   - Dari: `files: [primary.html, challenger.html]`
   - Ke: `root_directories: [08-lp/primary/, 08-lp/challenger/]` + `expected_files: [index.html, section/*.html, img/*, style.css]`
@@ -78,7 +87,7 @@
     6. No JS Folder
     7. Max 2 Variants
 
-### 4. `references/landing-page-constraints.md` (patch)
+### 5. `references/landing-page-constraints.md` (patch)
 - Section baru: **Persuasion Completeness QA Gate**
   - 7 checklist detail (sama kayak pipeline.yaml)
   - Scoring rules: tiap check 0.0–1.0, < 0.8 trigger fixer loop (max 2 retries)
@@ -134,8 +143,7 @@ Note: Section names di `section/` fleksibel per offer — nggak hardcode. Ngikut
 | Item | Status | Action |
 |------|--------|--------|
 | `schema-08-qa.json` | Belum dibuat | Direference di pipeline.yaml, perlu dibikin |
-| `SKILL.md` | Belum diupdate | Mungkin perlu mention step 08-qa |
-| GitHub repo | Belum ada | Skill ini belum di-init sebagai git repo |
+| GitHub repo | **Sudah dipush** | `github.com/re-sianturi/performance-ngegas` |
 
 ---
 

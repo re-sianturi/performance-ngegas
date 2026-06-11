@@ -30,8 +30,9 @@ menerima sebuah brief produk/jasa dan menghasilkan 9 deliverable:
 5. **05 Customer Motivation** — 20 pain/fear/desire/frustration + 15 behavioral triggers
 6. **06 Strategic Opportunity** — Expert team: Competitive Analysis + Opportunity Sizing → Strategic Positioning
 7. **07 CRO Plan** — 9 sections blueprint + A/B tests. Max 2 dieksekusi, archive ke-3+
-8. **08 Landing Page** — Primary + challenger HTML (max 2 variants)
-9. **09 QA Final** — QA gate + Red Team adversarial audit
+8. **08 Landing Page** — Primary + challenger HTML, multi-file structure (max 2 variants)
+9. **08-qa Persuasion Completeness QA Gate** — 7-point persuasion check before final QA
+10. **09 QA Final** — QA gate + Red Team adversarial audit
 
 **Architecture:** Multi-agent orchestration dengan artifact-first design. Setiap
 step menghasilkan file terstruktur (JSON) yang dibaca oleh step berikutnya.
@@ -54,7 +55,7 @@ BRIEF ──→ 01 Target Market ──→ 02 JTBD v1 ──→ 03 JTBD v2
                                                                              [AUTO CHECKPOINT]
                                                                                    │
                                                                                    ↓
-                                                                         07 CRO ──→ 08 LP ──→ 09 QA
+                                                                         07 CRO ──→ 08 LP ──→ 08-qa QA Gate ──→ 09 QA Final
 ```
 
 **Step 04 & 05 berjalan paralel** setelah Step 03 selesai.
@@ -123,7 +124,7 @@ Contoh tag (Step 07 CRO Plan):
 | 05 | `05-motivation/customer-motivation.json` | schema-05.json | JSON |
 | 06 | `06-strategy/strategic-positioning.json` | schema-06.json | JSON |
 | 07 | `07-cro/cro-plan.json` + `SCORING.md` + `plans/` + `archive/` + `sections/` + `ab-tests/` | schema-07.json | JSON + MD |
-| 08 | `08-lp/landing-page.json` + `index.html` + `section/*.html` + `img/` + `js/` + `primary.html` (fallback) + `challenger.html` (fallback) | schema-08.json | JSON + HTML |
+| 08 | `08-lp/landing-page.json` + `08-lp/primary/` (index.html + section/*.html + img/ + style.css) + `08-lp/challenger/` (index.html + section/*.html + img/ + style.css) | schema-08.json | JSON + HTML |
 | 09 | `09-qa/qa-report.json` | schema-09.json | JSON |
 
 ## QA Gate & Fixer Loop
@@ -197,30 +198,36 @@ Tidak boleh shared / cumulative. Symlink `latest/` selalu ke run terbaru.
 │   │   └── archive/
 │   │       └── plan-03.json
 │   ├── 08-lp/
-│   │   ├── index.html
-│   │   ├── section/
-│   │   │   ├── hero.html
-│   │   │   ├── problem-agitation.html
-│   │   │   ├── story.html
-│   │   │   ├── solution.html
-  ├── 08-lp/
-  │   ├── index.html
-  │   ├── section/
-  │   │   ├── hero.html
-  │   │   ├── problem.html
-  │   │   ├── mechanism.html
-  │   │   ├── proof.html
-  │   │   ├── faq.html
-  │   │   ├── cta.html
-  │   │   └── footer.html
-  │   ├── img/
-  │   │   ├── prompts.md
-  │   │   └── placeholder.md
-  │   ├── css/
-  │   │   └── style.css (optional)
-  │   ├── primary.html
-  │   ├── challenger.html
-  │   └── landing-page.json
+│   │   ├── primary/
+│   │   │   ├── index.html
+│   │   │   ├── section/
+│   │   │   │   ├── hero.html
+│   │   │   │   ├── problem.html
+│   │   │   │   ├── mechanism.html
+│   │   │   │   ├── proof.html
+│   │   │   │   ├── faq.html
+│   │   │   │   ├── cta.html
+│   │   │   │   └── footer.html
+│   │   │   ├── img/
+│   │   │   │   ├── prompts.md
+│   │   │   │   └── placeholder.md
+│   │   │   └── style.css
+│   │   ├── challenger/
+│   │   │   ├── index.html
+│   │   │   ├── section/
+│   │   │   │   ├── hero.html
+│   │   │   │   ├── problem.html
+│   │   │   │   ├── mechanism.html
+│   │   │   │   ├── proof.html
+│   │   │   │   ├── faq.html
+│   │   │   │   ├── cta.html
+│   │   │   │   └── footer.html
+│   │   │   ├── img/
+│   │   │   │   ├── prompts.md
+│   │   │   │   └── placeholder.md
+│   │   │   └── style.css
+│   │   ├── qa-report.json
+│   │   └── landing-page.json
 │   ├── 09-qa/
 │   │   └── qa-report.json
 │   ├── qa/
@@ -244,7 +251,8 @@ Tidak boleh shared / cumulative. Symlink `latest/` selalu ke run terbaru.
 06c ← 06-strategy/competitive-analysis.json + 06-strategy/opportunity-size.json
 07 ← 00-input/brief.json + 06-strategy/strategic-positioning.json + 05-motivation/customer-motivation.json
 08 ← 07-cro/cro-plan.json + 07-cro/plans/ + 06-strategy/strategic-positioning.json + 05-motivation/customer-motivation.json
-09 ← semua artifact 01-08
+08-qa ← 08-lp/ + 07-cro/cro-plan.json
+09 ← semua artifact 01-08 + 08-lp/qa-report.json
 ```
 
 ## Pre-Flight Gate (Brief Validation)
@@ -350,7 +358,7 @@ Plan ke-3+ masuk `07-cro/archive/` dan bisa di-activate manual.
 25. **Designer/Stitch handoff is a first-class artifact.** Kalau user minta prompt LP dilempar ke Stitch/designer, final package wajib punya `08-lp/stitch-design-brief.md`, `stitch-prompt-primary.md`, dan `stitch-prompt-challenger.md` per segmen. Jangan cuma sebut prompt di chat.
 26. **Target-role review loop per LP sebelum lanjut segmen berikutnya.** Setelah Step 08, simulate reviewer roles khusus segmen, score, buat `change-list.md`, implement revisi ke LP + Stitch prompt, tulis `implemented-changes.md`, baru lanjut.
 27. **Relative `.hermes/...` path can nest outputs in the wrong run.** Subagents harus diberi absolute output path (`/home/ubuntu/.hermes/runs/...`) dan Final QA harus verify filesystem, bukan percaya summary. Jika cwd/session sudah menunjuk folder yang terhapus, file/terminal tools bisa error `FileNotFoundError`; recover dengan absolute-path sandbox or restart context.
-28. **JANGAN output LP cuma 1 file HTML self-contained.** Schema-08 lama cuma define `file_path: string` (1 file per variant). Ini memaksa agent jadi single-file. Output HARUS multi-file: `index.html` + `section/*.html` + `img/` + `js/`. Lihat `references/lp-step-08-fix.md` untuk schema revised dan prompt patch.
+28. **JANGAN output LP cuma 1 file HTML self-contained.** Schema-08 lama cuma define `file_path: string` (1 file per variant). Ini memaksa agent jadi single-file. Output HARUS multi-file: `index.html` + `section/*.html` + `img/` + `style.css`. **NO `js/` folder. No JS files.** Lihat `references/lp-step-08-fix.md` untuk schema revised dan prompt patch.
 29. **Prompt 08 WAJIB define mandatory 12+ section framework.** Kalau prompt bilang "Jangan memaksa jumlah section" / "biarkan brief menentukan", agent output cuma 6 section (hero, problem, value, why, FAQ, CTA). Brief define 15 section di CRO Plan, tapi prompt override jadi "jangan dipaksa". Result: LP tipis, nggak persuasif, nggak ada scroll retention. WAJIB: 12+ section terpisah, masing-masing di file sendiri. Lihat `references/lp-step-08-fix.md` untuk mandatory section table.
 30. **Prompt 08 WAJIB include Direct Response Copywriter + Behavioral Economist roles.** Role lama cuma UI/UX + Frontend = fokus visual hierarchy, nggak persuasion. Tambah role: Senior Direct Response Copywriter (arsitektur persuasi, emotional journey, objection handling) + Behavioral Economist (nudge, scarcity, social proof, cognitive bias ethical). Lihat `references/lp-step-08-fix.md` untuk role definition.
 31. **QA Step 09 WAJIB cek persuasion completeness.** Selain schema compliance, QA harus verify: semua CRO plan section ada di LP, emotional arc (pain→agitation→solution→proof→CTA), objection handling (≥3), social proof (testimonial + stat), risk reversal (guarantee visible), genuine urgency (bukan fake), multi-file structure, image prompts exist, tracking placeholder exist. Kalau salah satu kurang = QA FAIL.
