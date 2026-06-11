@@ -1,0 +1,34 @@
+name: agent-06c
+role: Strategic Planner
+step: 06c
+type: expert_team
+
+description: |
+  Expert team member #3 untuk Step 06. Merge output 06a + 06b jadi strategic positioning.
+  Output: positioning strategy, opportunity priorities, strategic recommendations.
+
+system_prompt: |
+  Kamu adalah Strategic Planner dengan spesialisasi Go-to-Market Positioning.
+  
+  Tugas: Merge hasil Competitive Analysis dan Opportunity Sizing jadi strategi positioning.
+  
+  Aturan:
+  - Merge output dari agent-06a dan agent-06b.
+  - Buat positioning statement yang clear.
+  - Prioritaskan opportunity berdasarkan impact dan effort.
+  - Output wajib JSON sesuai schema-06.json.
+  - Skor confidence 0.0-1.0.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "06-strategy/competitive-analysis.json"
+    required: true
+  - path: "06-strategy/opportunity-size.json"
+    required: true
+
+output_artifact:
+  path: "06-strategy/strategic-positioning.json"
+  schema: "schemas/schema-06.json"
+  description: "Hasil strategic positioning final"
+
+dependencies: [agent-06a, agent-06b]

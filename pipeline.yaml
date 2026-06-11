@@ -1,0 +1,210 @@
+name: Performance NgeGAS
+version: 1.0.0
+description: |
+  9-total pipeline riset & eksekusi performance marketing.
+  8 step aktif + 1 QA final.
+  Output: artifact JSON/YAML per step, max 2 LP variants.
+
+pipeline:
+  total_steps: 9
+  active_steps: 8
+  qa_step: 09
+
+  # Step 00: Brief Validation Gate (pre-flight)
+  brief_validation:
+    enabled: true
+    required_elements:
+      - product_description
+      - target_audience_hint
+      - value_proposition
+      - pricing_model
+      - competitive_context
+    min_required: 3
+    fail_action: "pause_and_request_brief"
+
+  # Step definitions
+  steps:
+    - id: "01"
+      name: "Target Market Analysis"
+      agent: "agent-01"
+      type: "hat_system"
+      input: ["00-input/brief.json"]
+      output: "01-analysis/target-market.json"
+      schema: "schema-01.json"
+      dependencies: []
+      parallel: false
+
+    - id: "02"
+      name: "JTBD Deep Analysis v1"
+      agent: "agent-02"
+      type: "hat_system"
+      input: ["00-input/brief.json", "01-analysis/target-market.json"]
+      output: "02-jtbd-v1/jtbd-analysis.json"
+      schema: "schema-02.json"
+      dependencies: ["01"]
+      parallel: false
+
+    - id: "03"
+      name: "JTBD Deep Analysis v2"
+      agent: "agent-03"
+      type: "hat_system"
+      input: ["00-input/brief.json", "01-analysis/target-market.json", "02-jtbd-v1/jtbd-analysis.json"]
+      output: "03-jtbd-v2/jtbd-v2-analysis.json"
+      schema: "schema-03.json"
+      dependencies: ["01", "02"]
+      parallel: false
+
+    - id: "04"
+      name: "Life Role Profile"
+      agent: "agent-04"
+      type: "hat_system"
+      input: ["00-input/brief.json", "01-analysis/target-market.json", "02-jtbd-v1/jtbd-analysis.json", "03-jtbd-v2/jtbd-v2-analysis.json"]
+      output: "04-role-profile/life-role-profile.json"
+      schema: "schema-04.json"
+      dependencies: ["01", "02", "03"]
+      parallel: false
+
+    - id: "05"
+      name: "Customer Motivation Database"
+      agent: "agent-05"
+      type: "hat_system"
+      input: ["00-input/brief.json", "01-analysis/target-market.json", "02-jtbd-v1/jtbd-analysis.json", "03-jtbd-v2/jtbd-v2-analysis.json", "04-role-profile/life-role-profile.json"]
+      output: "05-motivation/customer-motivation.json"
+      schema: "schema-05.json"
+      dependencies: ["01", "02", "03", "04"]
+      parallel: false
+
+    - id: "06"
+      name: "Strategic Opportunity & Positioning"
+      type: "expert_team"
+      parallel_subagents: true
+      subagents:
+        - id: "06a"
+          name: "Competitive Analysis"
+          agent: "agent-06a"
+          input: ["00-input/brief.json", "01-analysis/target-market.json", "05-motivation/customer-motivation.json"]
+          output: "06-strategy/competitive-analysis.json"
+        - id: "06b"
+          name: "Opportunity Sizing"
+          agent: "agent-06b"
+          input: ["00-input/brief.json", "01-analysis/target-market.json", "05-motivation/customer-motivation.json"]
+          output: "06-strategy/opportunity-size.json"
+        - id: "06c"
+          name: "Strategic Planner"
+          agent: "agent-06c"
+          input: ["06-strategy/competitive-analysis.json", "06-strategy/opportunity-size.json"]
+          output: "06-strategy/strategic-positioning.json"
+          merge: true
+      schema: "schema-06.json"
+      dependencies: ["01", "05"]
+      parallel: true
+
+    - id: "07"
+      name: "CRO Plan Generator"
+      agent: "agent-07"
+      type: "hat_system"
+      input: ["00-input/brief.json", "06-strategy/strategic-positioning.json", "05-motivation/customer-motivation.json"]
+      output: "07-cro/cro-plan.json"
+      schema: "schema-07.json"
+      dependencies: ["06"]
+      parallel: false
+      multiplicity:
+        max_active: 2
+        archive_extra: true
+        archive_path: "07-cro/archive/"
+        scoring_file: "07-cro/SCORING.md"
+
+    - id: "08"
+      name: "Landing Page Builder"
+      agent: "agent-08"
+      type: "hat_system"
+      input: ["07-cro/cro-plan.json", "07-cro/plans/", "06-strategy/strategic-positioning.json", "05-motivation/customer-motivation.json"]
+      output: "08-lp/"
+      schema: "schema-08.json"
+      dependencies: ["07"]
+      parallel: false
+      variants:
+        max: 2
+        names: ["primary", "challenger"]
+        root_directories: ["08-lp/primary/", "08-lp/challenger/"]
+        expected_files:
+          - "index.html"
+          - "section/*.html"
+          - "img/*"
+          - "style.css"
+
+    - id: "08-qa"
+      name: "Persuasion Completeness QA Gate"
+      agent: "agent-08-qa"
+      type: "hat_system"
+      input: ["08-lp/", "07-cro/cro-plan.json"]
+      output: "08-lp/qa-report.json"
+      schema: "schema-08-qa.json"
+      dependencies: ["08"]
+      parallel: false
+      checks:
+        - "Every section in recommended_section_order exists as a file in section/"
+        - "conversion_psychology is visually executed (fear, desire, pain, objection, trust)"
+        - "messaging_hierarchy is present in copy (primary, secondary, emotional, proof, conversion)"
+        - "CRO Plan strategies are faithfully implemented (hero, mechanism, objection, proof, cta)"
+        - "Progressive disclosure is present"
+        - "No js/ folder exists"
+        - "Max 2 variants"
+
+    - id: "09"
+      name: "QA & Red Team Audit"
+      agent: "agent-09"
+      type: "hat_system"
+      input: ["00-input/brief.json", "01-analysis/target-market.json", "02-jtbd-v1/jtbd-analysis.json", "03-jtbd-v2/jtbd-v2-analysis.json", "04-role-profile/life-role-profile.json", "05-motivation/customer-motivation.json", "06-strategy/strategic-positioning.json", "07-cro/cro-plan.json", "08-lp/primary/", "08-lp/qa-report.json"]
+      output: "09-qa/qa-report.json"
+      schema: "schema-09.json"
+      dependencies: ["01", "02", "03", "04", "05", "06", "07", "08"]
+      parallel: false
+
+  # Quality gates
+  qa_gates:
+    confidence_threshold: 0.6
+    schema_validation: true
+    fixer_loop:
+      enabled: true
+      max_retries: 2
+      escalate_after: true
+
+  # Human checkpoints
+  checkpoints:
+    - step: "06"
+      type: "auto_jalan"
+      action: "log_summary_to_chat"
+      pause: false
+
+  # Resume capability
+  resume:
+    state_file: "state.json"
+    checkpoint_file: "checkpoint.md"
+    manifest_file: "manifest.json"
+
+  # Retention
+  retention:
+    archive_after_days: 30
+    delete_after_days: 60
+    keep_flag: "--keep"
+    latest_symlink: "latest"
+
+  # Run directory structure
+  run_structure:
+    root: "~/.hermes/runs/performance-ngegas/{timestamp}_{run_name}/"
+    folders:
+      - "00-input/"
+      - "01-analysis/"
+      - "02-jtbd-v1/"
+      - "03-jtbd-v2/"
+      - "04-role-profile/"
+      - "05-motivation/"
+      - "06-strategy/"
+      - "07-cro/plans/"
+      - "07-cro/sections/"
+      - "07-cro/ab-tests/"
+      - "07-cro/archive/"
+      - "08-lp/"
+      - "09-qa/"
+      - "qa/"

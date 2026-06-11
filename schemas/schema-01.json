@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Target Market Analysis",
+  "description": "Output schema for Step 01: Target Market Analysis",
+  "type": "object",
+  "required": ["metadata", "primary_buyer", "segments", "icp", "awareness_levels", "psychological_conditions", "decision_behavior", "priority_ranking", "executive_summary", "confidence_scores"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["step", "agent", "timestamp", "brief_hash"],
+      "properties": {
+        "step": { "type": "string", "enum": ["01"] },
+        "agent": { "type": "string", "enum": ["agent-01"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "brief_hash": { "type": "string", "description": "SHA256 hash of input brief" }
+      }
+    },
+    "primary_buyer": {
+      "type": "object",
+      "required": ["demographics", "profession", "income_level", "location", "education", "life_stage"],
+      "properties": {
+        "demographics": { "type": "string" },
+        "profession": { "type": "string" },
+        "income_level": { "type": "string" },
+        "location": { "type": "string" },
+        "education": { "type": "string" },
+        "life_stage": { "type": "string" }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["name", "characteristics", "primary_need", "buying_power", "urgency", "conversion_potential", "score"],
+        "properties": {
+          "name": { "type": "string" },
+          "characteristics": { "type": "string" },
+          "primary_need": { "type": "string" },
+          "buying_power": { "type": "string" },
+          "urgency": { "type": "string" },
+          "conversion_potential": { "type": "string" },
+          "score": { "type": "number", "minimum": 1, "maximum": 10 }
+        }
+      }
+    },
+    "icp": {
+      "type": "object",
+      "required": ["description", "why_best", "why_better_than_others", "buying_potential_score", "pain_points", "desires", "fears", "objections", "daily_language"],
+      "properties": {
+        "description": { "type": "string" },
+        "why_best": { "type": "string" },
+        "why_better_than_others": { "type": "string" },
+        "buying_potential_score": { "type": "number", "minimum": 1, "maximum": 10 },
+        "pain_points": { "type": "array", "minItems": 20, "maxItems": 20, "items": { "type": "string" } },
+        "desires": { "type": "array", "minItems": 20, "maxItems": 20, "items": { "type": "string" } },
+        "fears": { "type": "array", "minItems": 20, "maxItems": 20, "items": { "type": "string" } },
+        "objections": { "type": "array", "minItems": 20, "maxItems": 20, "items": { "type": "string" } },
+        "daily_language": { "type": "array", "minItems": 20, "maxItems": 20, "items": { "type": "string" } }
+      }
+    },
+    "awareness_levels": {
+      "type": "object",
+      "required": ["unaware", "problem_aware", "solution_aware", "product_aware", "most_aware"],
+      "properties": {
+        "unaware": { "type": "string" },
+        "problem_aware": { "type": "string" },
+        "solution_aware": { "type": "string" },
+        "product_aware": { "type": "string" },
+        "most_aware": { "type": "string" }
+      }
+    },
+    "psychological_conditions": {
+      "type": "object",
+      "required": ["biggest_fear", "biggest_frustration", "biggest_hope", "hidden_desire", "buying_motivation"],
+      "properties": {
+        "biggest_fear": { "type": "string" },
+        "biggest_frustration": { "type": "string" },
+        "biggest_hope": { "type": "string" },
+        "hidden_desire": { "type": "string" },
+        "buying_motivation": { "type": "string" }
+      }
+    },
+    "decision_behavior": {
+      "type": "object",
+      "required": ["influencers", "trust_factors", "doubt_factors", "urgency_factors"],
+      "properties": {
+        "influencers": { "type": "string" },
+        "trust_factors": { "type": "string" },
+        "doubt_factors": { "type": "string" },
+        "urgency_factors": { "type": "string" }
+      }
+    },
+    "priority_ranking": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["segment", "potential", "score", "reason"],
+        "properties": {
+          "segment": { "type": "string" },
+          "potential": { "type": "string", "enum": ["highest", "high", "medium", "low"] },
+          "score": { "type": "number", "minimum": 1, "maximum": 10 },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "executive_summary": {
+      "type": "object",
+      "required": ["primary_target", "secondary_target", "avoid_target", "strategic_reason"],
+      "properties": {
+        "primary_target": { "type": "string" },
+        "secondary_target": { "type": "string" },
+        "avoid_target": { "type": "string" },
+        "strategic_reason": { "type": "string" }
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": ["overall", "primary_buyer", "segments", "icp", "awareness", "psychological", "decision", "priority"],
+      "properties": {
+        "overall": { "type": "number", "minimum": 0, "maximum": 1 },
+        "primary_buyer": { "type": "number", "minimum": 0, "maximum": 1 },
+        "segments": { "type": "number", "minimum": 0, "maximum": 1 },
+        "icp": { "type": "number", "minimum": 0, "maximum": 1 },
+        "awareness": { "type": "number", "minimum": 0, "maximum": 1 },
+        "psychological": { "type": "number", "minimum": 0, "maximum": 1 },
+        "decision": { "type": "number", "minimum": 0, "maximum": 1 },
+        "priority": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["assumption", "reasoning"],
+        "properties": {
+          "assumption": { "type": "string" },
+          "reasoning": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Life Role Profile",
+  "description": "Output schema for Step 04: Life Role Profile",
+  "type": "object",
+  "required": [
+    "metadata",
+    "life_roles",
+    "actual_vs_aspirational",
+    "dominant_role",
+    "persona_variants",
+    "confidence_scores"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": [
+            "04"
+          ]
+        },
+        "agent": {
+          "type": "string",
+          "enum": [
+            "agent-04"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        }
+      }
+    },
+    "life_roles": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "role_name",
+          "description",
+          "influence_on_buying",
+          "product_relevance"
+        ],
+        "properties": {
+          "role_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "influence_on_buying": {
+            "type": "string"
+          },
+          "product_relevance": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "actual_vs_aspirational": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "actual_state",
+          "aspirational_state",
+          "gap",
+          "how_product_bridges"
+        ],
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "actual_state": {
+            "type": "string"
+          },
+          "aspirational_state": {
+            "type": "string"
+          },
+          "gap": {
+            "type": "string"
+          },
+          "how_product_bridges": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "dominant_role": {
+      "type": "object",
+      "required": [
+        "role",
+        "reason",
+        "buying_power"
+      ],
+      "properties": {
+        "role": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "buying_power": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10
+        }
+      }
+    },
+    "persona_variants": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "variant_name",
+          "role_combination",
+          "key_traits",
+          "messaging_angle"
+        ],
+        "properties": {
+          "variant_name": {
+            "type": "string"
+          },
+          "role_combination": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "key_traits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "messaging_angle": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "life_roles",
+        "actual_vs_aspirational",
+        "dominant_role",
+        "persona_variants"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "life_roles": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "actual_vs_aspirational": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dominant_role": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "persona_variants": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

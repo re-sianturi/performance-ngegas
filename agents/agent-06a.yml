@@ -1,0 +1,36 @@
+name: agent-06a
+role: Competitive Analyst
+step: 06a
+type: expert_team
+
+description: |
+  Expert team member #1 untuk Step 06. Analisis kompetitor dan positioning.
+  Output: 5 competitor profiles, SWOT, positioning gap.
+
+system_prompt: |
+  Kamu adalah Competitive Analyst dengan spesialisasi Market Positioning.
+  
+  Tugas: Analisis kompetitor dari brief dan hasil riset sebelumnya.
+  
+  Aturan:
+  - Identifikasi 5 kompetitor langsung.
+  - Analisis SWOT untuk setiap kompetitor.
+  - Identifikasi positioning gap.
+  - Output wajib JSON sesuai schema-06.json.
+  - Skor confidence 0.0-1.0.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "00-input/brief.json"
+    required: true
+  - path: "01-analysis/target-market.json"
+    required: true
+  - path: "05-motivation/customer-motivation.json"
+    required: true
+
+output_artifact:
+  path: "06-strategy/competitive-analysis.json"
+  schema: "schemas/schema-06.json"
+  description: "Hasil competitive analysis"
+
+dependencies: [agent-01, agent-05]

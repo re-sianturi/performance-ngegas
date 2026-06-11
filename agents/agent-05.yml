@@ -1,0 +1,40 @@
+name: agent-05
+role: Behavioral Economist
+step: 05
+type: hat_system
+
+description: |
+  Behavioral Economist yang memetakan motivasi psikologis: pain, fear, desire, frustration.
+  Tugas: menghasilkan database 20 pain point, 20 desire, 20 fear, 20 frustration, 15 behavioral triggers.
+  Output: customer motivation database.
+
+system_prompt: |
+  Kamu adalah Behavioral Economist dengan spesialisasi Consumer Motivation Mapping.
+  
+  Tugas: Identifikasi motivasi psikologis mendalam dari target customer.
+  
+  Aturan:
+  - Bedakan surface-level vs deep-level motivation.
+  - Identifikasi 20 pain point, 20 desire, 20 fear, 20 frustration.
+  - Output wajib JSON sesuai schema-05.json.
+  - Skor confidence 0.0-1.0 per section.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "00-input/brief.json"
+    required: true
+  - path: "01-analysis/target-market.json"
+    required: true
+  - path: "02-jtbd-v1/jtbd-analysis.json"
+    required: true
+  - path: "03-jtbd-v2/jtbd-v2-analysis.json"
+    required: true
+  - path: "04-role-profile/life-role-profile.json"
+    required: true
+
+output_artifact:
+  path: "05-motivation/customer-motivation.json"
+  schema: "schemas/schema-05.json"
+  description: "Hasil customer motivation database"
+
+dependencies: [agent-01, agent-02, agent-03, agent-04]

@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Landing Page Implementation",
+  "description": "Output schema for Step 08: Landing Page Builder. Multi-file structure per variant. No JS folder.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "variants",
+    "assets",
+    "confidence_scores"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash",
+        "cro_plan_reference"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": [
+            "08"
+          ]
+        },
+        "agent": {
+          "type": "string",
+          "enum": [
+            "agent-08"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        },
+        "cro_plan_reference": {
+          "type": "string",
+          "description": "Path to the CRO Plan used as single source of truth (e.g., 07-cro/cro-plan.json)"
+        }
+      }
+    },
+    "variants": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "variant_name",
+          "type",
+          "root_directory",
+          "files",
+          "section_order",
+          "components_included",
+          "html_summary"
+        ],
+        "properties": {
+          "variant_name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "challenger"
+            ]
+          },
+          "root_directory": {
+            "type": "string",
+            "description": "Root directory for this variant (e.g., 08-lp/primary/ or 08-lp/challenger/)"
+          },
+          "files": {
+            "type": "array",
+            "description": "All files in this variant. Must include index.html and all section files from section_order.",
+            "items": {
+              "type": "object",
+              "required": [
+                "file_path",
+                "file_type"
+              ],
+              "properties": {
+                "file_path": {
+                  "type": "string",
+                  "description": "Relative path from root_directory (e.g., index.html, section/hero.html, img/hero-bg.webp, style.css)"
+                },
+                "file_type": {
+                  "type": "string",
+                  "enum": [
+                    "html",
+                    "css",
+                    "image",
+                    "asset"
+                  ],
+                  "description": "html=HTML file, css=stylesheet, image=image asset, asset=other static asset"
+                },
+                "section_name": {
+                  "type": "string",
+                  "description": "For file_type=html in section/ folder, the section name matching section_order entry"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Brief description of what this file contains"
+                }
+              }
+            }
+          },
+          "section_order": {
+            "type": "array",
+            "description": "Exact section names in display order, copied from CRO Plan recommended_section_order",
+            "items": {
+              "type": "string"
+            }
+          },
+          "components_included": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "html_summary": {
+            "type": "string",
+            "description": "High-level summary of what this variant does and how it differs from the other variant"
+          }
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_type",
+          "description",
+          "required"
+        ],
+        "properties": {
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "image",
+              "video",
+              "copy",
+              "icon",
+              "form",
+              "css"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "primary",
+        "challenger"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "primary": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "challenger": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

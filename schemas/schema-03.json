@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JTBD Analysis v2",
+  "description": "Output schema for Step 03: JTBD Deep Analysis v2 (Deep Job Map)",
+  "type": "object",
+  "required": [
+    "metadata",
+    "deep_job_maps",
+    "cross_reference_v1",
+    "situational_triggers",
+    "alternative_solutions",
+    "switching_barriers",
+    "trigger_words",
+    "confidence_scores"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": [
+            "03"
+          ]
+        },
+        "agent": {
+          "type": "string",
+          "enum": [
+            "agent-03"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        }
+      }
+    },
+    "deep_job_maps": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "job_name",
+          "actual_job",
+          "aspirational_job",
+          "job_map_stages",
+          "emotional_journey"
+        ],
+        "properties": {
+          "job_name": {
+            "type": "string"
+          },
+          "actual_job": {
+            "type": "string"
+          },
+          "aspirational_job": {
+            "type": "string"
+          },
+          "job_map_stages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "emotional_journey": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "cross_reference_v1": {
+      "type": "object",
+      "required": [
+        "consistencies",
+        "inconsistencies",
+        "reconciliations"
+      ],
+      "properties": {
+        "consistencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inconsistencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reconciliations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "situational_triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "trigger",
+          "context",
+          "frequency"
+        ],
+        "properties": {
+          "trigger": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "occasional",
+              "rare"
+            ]
+          }
+        }
+      }
+    },
+    "alternative_solutions": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "required": [
+          "solution",
+          "type",
+          "why_used",
+          "weakness"
+        ],
+        "properties": {
+          "solution": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "direct_competitor",
+              "indirect_competitor",
+              "workaround",
+              "status_quo",
+              "substitute"
+            ]
+          },
+          "why_used": {
+            "type": "string"
+          },
+          "weakness": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "switching_barriers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "barrier",
+          "type",
+          "severity",
+          "mitigation"
+        ],
+        "properties": {
+          "barrier": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "cost",
+              "effort",
+              "risk",
+              "habit",
+              "social",
+              "emotional"
+            ]
+          },
+          "severity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "mitigation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "trigger_words": {
+      "type": "array",
+      "minItems": 20,
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "deep_job_maps",
+        "cross_reference",
+        "triggers",
+        "alternatives",
+        "barriers",
+        "trigger_words"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "deep_job_maps": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "cross_reference": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "triggers": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "alternatives": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "barriers": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "trigger_words": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

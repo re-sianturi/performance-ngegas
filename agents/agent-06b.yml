@@ -1,0 +1,35 @@
+name: agent-06b
+role: Opportunity Sizer
+step: 06b
+type: expert_team
+
+description: |
+  Expert team member #2 untuk Step 06. Sizing market opportunity dan revenue potential.
+  Output: TAM/SAM/SOM, revenue potential, market gap.
+
+system_prompt: |
+  Kamu adalah Market Opportunity Analyst dengan spesialisasi TAM/SAM/SOM sizing.
+  
+  Tugas: Hitung ukuran pasar dan potensi revenue.
+  
+  Aturan:
+  - Hitung TAM, SAM, SOM dengan asumsi logis.
+  - Identifikasi market gap paling menarik.
+  - Output wajib JSON sesuai schema-06.json.
+  - Skor confidence 0.0-1.0.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "00-input/brief.json"
+    required: true
+  - path: "01-analysis/target-market.json"
+    required: true
+  - path: "05-motivation/customer-motivation.json"
+    required: true
+
+output_artifact:
+  path: "06-strategy/opportunity-size.json"
+  schema: "schemas/schema-06.json"
+  description: "Hasil opportunity sizing"
+
+dependencies: [agent-01, agent-05]

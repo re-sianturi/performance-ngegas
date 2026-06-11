@@ -1,0 +1,164 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QA Final Report",
+  "description": "Output schema for Step 09: QA & Red Team Audit",
+  "type": "object",
+  "required": [
+    "metadata",
+    "step_audits",
+    "overall_status",
+    "fix_recommendations",
+    "confidence_scores"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash",
+        "pipeline_version"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": [
+            "09"
+          ]
+        },
+        "agent": {
+          "type": "string",
+          "enum": [
+            "agent-09"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        },
+        "pipeline_version": {
+          "type": "string"
+        }
+      }
+    },
+    "step_audits": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "step",
+          "status",
+          "schema_compliant",
+          "confidence_pass",
+          "completeness",
+          "issues",
+          "red_team_findings"
+        ],
+        "properties": {
+          "step": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "NEEDS_FIX",
+              "FAIL"
+            ]
+          },
+          "schema_compliant": {
+            "type": "boolean"
+          },
+          "confidence_pass": {
+            "type": "boolean"
+          },
+          "completeness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "red_team_findings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "overall_status": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "NEEDS_FIX",
+        "FAIL"
+      ]
+    },
+    "fix_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "step",
+          "issue",
+          "severity",
+          "recommendation",
+          "fixable"
+        ],
+        "properties": {
+          "step": {
+            "type": "string"
+          },
+          "issue": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "fixable": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "step_audits"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "step_audits": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

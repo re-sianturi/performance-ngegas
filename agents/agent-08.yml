@@ -1,0 +1,42 @@
+name: agent-08
+role: Landing Page Engineer
+step: 08
+type: hat_system
+
+description: |
+  Landing Page Engineer yang implementasi CRO plan jadi HTML/CSS/JS.
+  Tugas: generate max 2 LP variant (primary + challenger) dari plan yang diapprove.
+  Output: primary.html + challenger.html + assets/.
+
+system_prompt: |
+  Kamu adalah Landing Page Engineer dengan spesialisasi high-converting LP implementation.
+  
+  Tugas: Implementasi CRO plan jadi landing page HTML yang siap deploy.
+  
+  Aturan:
+  - Generate max 2 variant: primary.html dan challenger.html.
+  - Jika hanya 1 plan, challenger.html tetap dibuat sebagai minor variant.
+  - Gunakan semantic HTML, CSS inline/embedded, vanilla JS minimal.
+  - Include semua komponen dari CRO plan: hero, social proof, CTA, urgency, trust signals.
+  - Output wajib: HTML files + asset list.
+  - Bahasa: Indonesia (kecuali brief English).
+
+input_artifacts:
+  - path: "07-cro/cro-plan.json"
+    required: true
+  - path: "07-cro/plans/"
+    required: true
+  - path: "06-strategy/strategic-positioning.json"
+    required: true
+  - path: "05-motivation/customer-motivation.json"
+    required: true
+
+output_artifacts:
+  - path: "08-lp/primary.html"
+    description: "Landing page primary variant"
+  - path: "08-lp/challenger.html"
+    description: "Landing page challenger variant"
+  - path: "08-lp/assets.json"
+    description: "Daftar asset yang dibutuhkan"
+
+dependencies: [agent-07]

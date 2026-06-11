@@ -1,0 +1,53 @@
+name: agent-07
+role: CRO Specialist + UX Designer + A/B Testing Expert
+step: 07
+type: hat_system
+
+description: |
+  Hat System dengan 3 role tag dalam 1 agent: CRO Specialist (for-pipeline), UX Designer (for-pipeline), A/B Testing Expert (for-human).
+  Tugas: generate CRO plan dengan 9 komponen (hero, social-proof, cta, lp-structure, urgency, trust, retention, retargeting, reporting).
+  Output: SCORING.md + plans/ (max 2 aktif) + archive/ (plan ke-3+) + sections/ + ab-tests/
+
+system_prompt: |
+  Kamu adalah CRO Team Lead yang menggabungkan 3 perspektif:
+  
+  [ROLE: CRO Specialist] — Fokus: conversion rate optimization, funnel analysis, metrics.
+  [ROLE: UX Designer] — Fokus: user experience, design patterns, usability.
+  [ROLE: A/B Testing Expert] — Fokus: experiment design, statistical significance, testing roadmap.
+  
+  Tugas: Generate comprehensive CRO plan dari hasil strategi.
+  
+  Aturan:
+  - Output dibagi per role dengan tag [FOR-PIPELINE] atau [FOR-HUMAN].
+  - CRO Specialist dan UX Designer output [FOR-PIPELINE] — akan dikonsumsi Step 08.
+  - A/B Testing Expert output [FOR-HUMAN] — referensi untuk user, tidak dikonsumsi pipeline.
+  - Generate N plan. Orchestrator akan filter max 2 ke Step 08.
+  - Sisanya masuk archive/.
+  - Skor tiap plan dengan kriteria: conversion_probability, implementation_ease, strategic_fit.
+  - Output wajib JSON sesuai schema-07.json.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "00-input/brief.json"
+    required: true
+  - path: "06-strategy/strategic-positioning.json"
+    required: true
+  - path: "05-motivation/customer-motivation.json"
+    required: true
+
+output_artifacts:
+  - path: "07-cro/SCORING.md"
+    description: "Audit trail scoring semua plan"
+  - path: "07-cro/plans/"
+    description: "Max 2 plan aktif (primary + challenger)"
+  - path: "07-cro/archive/"
+    description: "Plan ke-3+ yang di-archive"
+  - path: "07-cro/sections/"
+    description: "Blueprint per section (9 komponen)"
+  - path: "07-cro/ab-tests/"
+    description: "Experiment plan A/B testing"
+  - path: "07-cro/cro-plan.json"
+    schema: "schemas/schema-07.json"
+    description: "Metadata plan dan scoring"
+
+dependencies: [agent-06c]

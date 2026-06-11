@@ -1,0 +1,247 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CRO Plan",
+  "description": "Output schema for Step 07: CRO Plan Generator",
+  "type": "object",
+  "required": [
+    "metadata",
+    "plans",
+    "scoring",
+    "sections",
+    "ab_tests",
+    "confidence_scores"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": [
+            "07"
+          ]
+        },
+        "agent": {
+          "type": "string",
+          "enum": [
+            "agent-07"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        }
+      }
+    },
+    "plans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "plan_id",
+          "plan_name",
+          "variant_type",
+          "components",
+          "conversion_probability",
+          "implementation_ease",
+          "strategic_fit",
+          "overall_score",
+          "selected_for_execution"
+        ],
+        "properties": {
+          "plan_id": {
+            "type": "string"
+          },
+          "plan_name": {
+            "type": "string"
+          },
+          "variant_type": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "challenger",
+              "archive"
+            ]
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "component",
+                "strategy",
+                "implementation"
+              ],
+              "properties": {
+                "component": {
+                  "type": "string",
+                  "enum": [
+                    "hero",
+                    "social_proof",
+                    "cta",
+                    "lp_structure",
+                    "urgency",
+                    "trust",
+                    "retention",
+                    "retargeting",
+                    "reporting"
+                  ]
+                },
+                "strategy": {
+                  "type": "string"
+                },
+                "implementation": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "conversion_probability": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "implementation_ease": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "strategic_fit": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "overall_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "selected_for_execution": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "required": [
+        "criteria",
+        "method",
+        "audit_trail"
+      ],
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "method": {
+          "type": "string"
+        },
+        "audit_trail": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "component",
+          "blueprint",
+          "for_pipeline"
+        ],
+        "properties": {
+          "component": {
+            "type": "string"
+          },
+          "blueprint": {
+            "type": "string"
+          },
+          "for_pipeline": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "ab_tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "test_id",
+          "hypothesis",
+          "variant_a",
+          "variant_b",
+          "metric",
+          "duration"
+        ],
+        "properties": {
+          "test_id": {
+            "type": "string"
+          },
+          "hypothesis": {
+            "type": "string"
+          },
+          "variant_a": {
+            "type": "string"
+          },
+          "variant_b": {
+            "type": "string"
+          },
+          "metric": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "plans",
+        "sections",
+        "ab_tests"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "plans": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sections": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "ab_tests": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

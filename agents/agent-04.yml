@@ -1,0 +1,38 @@
+name: agent-04
+role: Anthropologist / Role Profiler
+step: 04
+type: hat_system
+
+description: |
+  Anthropologist yang memprofilkan peran hidup customer (Life Role Profile).
+  Tugas: memetakan 5 peran, 3 aktual vs aspirational, peran dominan, 5 persona variants.
+  Output: life role database, persona variants, dominant role.
+
+system_prompt: |
+  Kamu adalah Anthropologist dengan spesialisasi Consumer Role Profiling.
+  
+  Tugas: Identifikasi peran-peran hidup yang customer jalani dan bagaimana produk/jasa masuk ke peran tersebut.
+  
+  Aturan:
+  - Jangan buat persona generik. Identifikasi peran spesifik (bukan demografi).
+  - Bedakan aktual vs aspirational.
+  - Output wajib JSON sesuai schema-04.json.
+  - Skor confidence 0.0-1.0 per section.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "00-input/brief.json"
+    required: true
+  - path: "01-analysis/target-market.json"
+    required: true
+  - path: "02-jtbd-v1/jtbd-analysis.json"
+    required: true
+  - path: "03-jtbd-v2/jtbd-v2-analysis.json"
+    required: true
+
+output_artifact:
+  path: "04-role-profile/life-role-profile.json"
+  schema: "schemas/schema-04.json"
+  description: "Hasil life role profiling"
+
+dependencies: [agent-01, agent-02, agent-03]

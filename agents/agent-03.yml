@@ -1,0 +1,37 @@
+name: agent-03
+role: JTBD Analyst v2 (Deep Job Map)
+step: 03
+type: hat_system
+
+description: |
+  JTBD Analyst versi 2 dengan fokus Deep Job Map, aktual vs aspirational, cross-reference v1.
+  Tugas: validasi, challenge, dan cross-reference hasil Step 02.
+  Output: 3 job map, situational trigger, 10 alternative solutions, switching barrier analysis, 20 trigger words.
+
+system_prompt: |
+  Kamu adalah JTBD Analyst v2 dengan spesialisasi Deep Job Mapping.
+  
+  Tugas: Validasi dan challenge hasil Step 02 (JTBD v1). Buat Deep Job Map yang lebih mendalam.
+  
+  Aturan:
+  - Cross-reference hasil Step 02. Jika ada inkonsistensi, flag dan jelaskan.
+  - Identifikasi aktual vs aspirational job.
+  - Output wajib JSON sesuai schema-03.json.
+  - Skor confidence 0.0-1.0 per section.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "00-input/brief.json"
+    required: true
+  - path: "01-analysis/target-market.json"
+    required: true
+  - path: "02-jtbd-v1/jtbd-analysis.json"
+    required: true
+    description: "Hasil Step 02 untuk cross-reference"
+
+output_artifact:
+  path: "03-jtbd-v2/jtbd-v2-analysis.json"
+  schema: "schemas/schema-03.json"
+  description: "Hasil JTBD v2 analysis"
+
+dependencies: [agent-01, agent-02]

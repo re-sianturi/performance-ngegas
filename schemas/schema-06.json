@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Strategic Opportunity & Positioning",
+  "description": "Output schema for Step 06: Strategic Opportunity Analysis",
+  "type": "object",
+  "required": [
+    "metadata",
+    "competitive_analysis",
+    "opportunity_sizing",
+    "strategic_positioning",
+    "priority_recommendations",
+    "confidence_scores"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": [
+            "06"
+          ]
+        },
+        "agent": {
+          "type": "string",
+          "enum": [
+            "agent-06c"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        }
+      }
+    },
+    "competitive_analysis": {
+      "type": "object",
+      "required": [
+        "competitors",
+        "swot_summary",
+        "positioning_gaps"
+      ],
+      "properties": {
+        "competitors": {
+          "type": "array",
+          "minItems": 5,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "strengths",
+              "weaknesses",
+              "threats",
+              "opportunities"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "strengths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "weaknesses": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "threats": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "opportunities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "swot_summary": {
+          "type": "string"
+        },
+        "positioning_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "opportunity_sizing": {
+      "type": "object",
+      "required": [
+        "tam",
+        "sam",
+        "som",
+        "revenue_potential",
+        "market_gaps"
+      ],
+      "properties": {
+        "tam": {
+          "type": "string"
+        },
+        "sam": {
+          "type": "string"
+        },
+        "som": {
+          "type": "string"
+        },
+        "revenue_potential": {
+          "type": "string"
+        },
+        "market_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "strategic_positioning": {
+      "type": "object",
+      "required": [
+        "positioning_statement",
+        "value_proposition",
+        "differentiation",
+        "key_messages"
+      ],
+      "properties": {
+        "positioning_statement": {
+          "type": "string"
+        },
+        "value_proposition": {
+          "type": "string"
+        },
+        "differentiation": {
+          "type": "string"
+        },
+        "key_messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "priority_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "opportunity",
+          "impact",
+          "effort",
+          "priority",
+          "rationale"
+        ],
+        "properties": {
+          "opportunity": {
+            "type": "string"
+          },
+          "impact": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "effort": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "priority": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "rationale": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "competitive",
+        "opportunity",
+        "positioning"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "competitive": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "opportunity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "positioning": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

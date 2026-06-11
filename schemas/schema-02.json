@@ -1,0 +1,262 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JTBD Analysis v1",
+  "description": "Output schema for Step 02: JTBD Deep Analysis v1 (Christensen-Moesta)",
+  "type": "object",
+  "required": [
+    "metadata",
+    "job_list",
+    "job_stories",
+    "progress_map",
+    "job_drivers",
+    "job_blockers",
+    "hiring_criteria",
+    "confidence_scores"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": [
+            "02"
+          ]
+        },
+        "agent": {
+          "type": "string",
+          "enum": [
+            "agent-02"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        }
+      }
+    },
+    "job_list": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "job_type",
+          "description",
+          "context",
+          "motivation",
+          "expected_outcome"
+        ],
+        "properties": {
+          "job_type": {
+            "type": "string",
+            "enum": [
+              "functional",
+              "emotional",
+              "social"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "motivation": {
+            "type": "string"
+          },
+          "expected_outcome": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "job_stories": {
+      "type": "array",
+      "minItems": 15,
+      "items": {
+        "type": "object",
+        "required": [
+          "story",
+          "job_type",
+          "priority"
+        ],
+        "properties": {
+          "story": {
+            "type": "string"
+          },
+          "job_type": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          }
+        }
+      }
+    },
+    "progress_map": {
+      "type": "object",
+      "required": [
+        "current_state",
+        "desired_state",
+        "progress_forces",
+        "barriers"
+      ],
+      "properties": {
+        "current_state": {
+          "type": "string"
+        },
+        "desired_state": {
+          "type": "string"
+        },
+        "progress_forces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "barriers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "job_drivers": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "driver",
+          "description",
+          "impact"
+        ],
+        "properties": {
+          "driver": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "impact": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          }
+        }
+      }
+    },
+    "job_blockers": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "blocker",
+          "description",
+          "severity"
+        ],
+        "properties": {
+          "blocker": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          }
+        }
+      }
+    },
+    "hiring_criteria": {
+      "type": "array",
+      "minItems": 20,
+      "items": {
+        "type": "object",
+        "required": [
+          "criterion",
+          "importance",
+          "how_product_satisfies"
+        ],
+        "properties": {
+          "criterion": {
+            "type": "string"
+          },
+          "importance": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "how_product_satisfies": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "confidence_scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "job_list",
+        "job_stories",
+        "progress_map",
+        "drivers",
+        "blockers",
+        "hiring_criteria"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "job_list": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "job_stories": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "progress_map": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "drivers": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "blockers": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "hiring_criteria": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+name: agent-09
+role: QA Lead + Red Team Adversarial
+step: 09
+type: hat_system
+
+description: |
+  QA gate final dengan dual role: QA Lead (validasi) + Red Team (serang argumentasi).
+  Tugas: audit semua artifact, temukan weakness, kasih rekomendasi perbaikan.
+  Output: QA report dengan status PASS/NEEDS_FIX/FAIL per step.
+
+system_prompt: |
+  Kamu adalah QA Lead dan Red Team Adversarial dalam 1 persona.
+  
+  [ROLE: QA Lead] — Validasi: completeness, schema compliance, confidence threshold, consistency.
+  [ROLE: Red Team] — Serang: cari logical flaws, missing evidence, overclaim, bias, contradictions.
+  
+  Tugas: Audit seluruh pipeline output.
+  
+  Aturan:
+  - Cek setiap artifact terhadap schema-nya.
+  - Confidence threshold: >= 0.6 untuk PASS, < 0.6 untuk NEEDS_FIX.
+  - Jika NEEDS_FIX, list specific gaps dan rekomendasi.
+  - Jika FAIL, list blockers dan apakah bisa di-fix atau harus restart.
+  - Output wajib JSON sesuai schema-09.json.
+  - Bahasa: Indonesia.
+
+input_artifacts:
+  - path: "00-input/brief.json"
+    required: true
+  - path: "01-analysis/target-market.json"
+    required: true
+  - path: "02-jtbd-v1/jtbd-analysis.json"
+    required: true
+  - path: "03-jtbd-v2/jtbd-v2-analysis.json"
+    required: true
+  - path: "04-role-profile/life-role-profile.json"
+    required: true
+  - path: "05-motivation/customer-motivation.json"
+    required: true
+  - path: "06-strategy/strategic-positioning.json"
+    required: true
+  - path: "07-cro/cro-plan.json"
+    required: true
+  - path: "08-lp/primary.html"
+    required: true
+  - path: "08-lp/challenger.html"
+    required: false
+
+output_artifact:
+  path: "09-qa/qa-report.json"
+  schema: "schemas/schema-09.json"
+  description: "QA final report"
+
+dependencies: [agent-01, agent-02, agent-03, agent-04, agent-05, agent-06c, agent-07, agent-08]
