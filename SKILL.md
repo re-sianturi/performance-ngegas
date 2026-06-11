@@ -7,7 +7,7 @@ description: |
   Multi-agent orchestration dengan artifact-first output (JSON/YAML), file-to-file
   pipeline, QA gates, fixer loops, archive/activate capability, dan auto-jalan
   checkpoint. Output: structured research artifacts + ready-to-publish landing page HTML.
-version: 1.0.4
+version: 1.0.5
 author: Hermes Agent
 license: MIT
 metadata:
@@ -319,6 +319,43 @@ Plan ke-3+ masuk `07-cro/archive/` dan bisa di-activate manual.
 - Run > 60 hari: dihapus kecuali flagged `--keep`
 - `latest/` symlink selalu ke run terbaru
 
+## Landing Page Revision Entry Points
+
+**Pertanyaan yang sering:** "Kalo mau perbaiki LP yang udah ada, start dari step mana?"
+
+Pipeline NgeGAS desain untuk **run baru dari brief**, tapi bukan berarti harus dari 0 tiap kali. Ada 3 entry point untuk LP revision:
+
+### 1. LP dari run pipeline sebelumnya, artifact riset (01-07) lengkap
+**→ Mulai dari Step 08 (Landing Page Builder) + Step 08-qa (Persuasion Completeness QA).**
+
+Agent-08 baca `07-cro/cro-plan.json` + `07-cro/plans/` + `06-strategy/` + `05-motivation/` terus rebuild LP-nya. Step 08-qa cek apakah section, psychology, dan progressive disclosure faithful ke CRO Plan.
+
+### 2. LP dari run sebelumnya, status `NEEDS_FIX`
+**→ Fix masalahnya manual, terus jalankan re-QA (Step 08-qa atau Step 09).**
+
+Jangan ulang dari 0. Kalau `state.json` masih `NEEDS_FIX` setelah fix, wajib re-QA supaya `state.json` dan `manifest.json` update ke `PASS`. Tanpa re-QA, run stuck di `NEEDS_FIX` meskipun issue sudah resolved.
+
+### 3. LP dari luar pipeline / tidak ada artifact riset (01-07)
+**→ Mesti turun lebih dalam.** Tabel keputusan:
+
+| Masalah yang mau diperbaiki | Mulai dari step |
+|---|---|
+| Visual, layout, struktur section, persuasion execution | **08** (rebuild dari CRO Plan yang ada) |
+| Copywriting tidak meyakinkan, messaging salah, CTA lemah | **07** (revisi CRO Plan) atau **06** (revisi strategi) |
+| Audience tidak nyambung, value prop salah, offer mismatch | **05** atau lebih rendah (riset ulang) |
+| Brief sendiri tidak jelas atau salah | **00** (mulai dari brief baru) |
+
+### Critical Dependency Check
+
+**Step 08 butuh file-file ini — cek sebelum dispatch:**
+- `07-cro/cro-plan.json` ← **WAJIB**, single source of truth untuk section blueprint
+- `06-strategy/strategic-positioning.json` ← positioning context
+- `05-motivation/customer-motivation.json` ← behavioral triggers
+
+Kalau salah satu missing, agent-08 tidak bisa jalan. Musti turun ke step yang menghasilkan file missing itu.
+
+---
+
 ## Pitfalls
 
 1. **Jangan parallel semua step.** Overhead merge > benefit. Hat System cukup untuk domain adjacent.
@@ -345,23 +382,28 @@ Plan ke-3+ masuk `07-cro/archive/` dan bisa di-activate manual.
 16. **HARUS ada metadata JSON.** Step 08 wajib output `08-lp/landing-page.json` sesuai schema-08. HTML dan assets.json tidak cukup. Schema-08 butuh: metadata, variants array dengan html_summary, confidence_scores.
 17. **Stitch integration: pakai curl, bukan SDK.** SDK `@google/stitch-sdk` v0.3.5 ada bug double `projects/` prefix. Gunakan direct curl ke `stitch.googleapis.com/mcp` dengan numeric project ID. Lihat `stitch-sdk-hermes` skill untuk script wrapper.
 14. **Subagent timeout ≠ gagal.** delegate_task sering write file sebelum timeout (600s). Selalu cek filesystem dulu (`find` / `ls`) sebelum dispatch retry. Kalau file sudah ada dan valid, anggap selesai. Retry cuma kalau file kosong atau corrupted. Retry FOCUSED: cuma kerjakan bagian yang kurang, jangan ulang dari nol.
-15. **Parallel dispatch pakai `tasks` array di delegate_task.** Untuk Expert Team (Step 06), gunakan `delegate_task(tasks=[{...}, {...}])` bukan dua `delegate_task` terpisah.
+15. **delegate_task task string length limit.** Task descriptions > ~8 KB sering fail dengan "Error invoking agent" (no stack trace). Keep task strings concise; reference file paths instead of inlining full content. Split into shorter, focused tasks. First observed June 2026 during 7-run batch rebuild.
+16. **Parallel dispatch pakai `tasks` array di delegate_task.** Untuk Expert Team (Step 06), gunakan `delegate_task(tasks=[{...}, {...}])` bukan dua `delegate_task` terpisah.
 16. **Step 08 output wajib `08-lp/landing-page.json` metadata.** QA gate FAIL kalau cuma HTML + assets tanpa JSON. Generate sesuai schema-08.
 17. **Statistik di LP harus punya sumber.** Jangan propagate angka tanpa sumber ke landing page. QA Red Team akan flag. Gunakan bahasa kualitatif ("Banyak ibu...") atau tandai `[BUTUH DATA]`.
 18. **Fake scarcity dilarang di LP.** `Math.random()` counter, countdown reset, "stok tinggal X" palsu = kontradiksi dengan trust positioning. Urgency berbasis real: batch terbatas, harga early bird, bonus periode.
 19. **Stitch SDK preferred untuk LP.** User expects proper UI; tawarkan Stitch dulu (`creative/stitch-sdk-hermes`). Fallback ke Tailwind HTML manual kalau Stitch gagal.
 20. **Step 07 CRO file yang di-output.** Pastikan 15 file lengkap: `cro-plan.json`, `SCORING.md`, `plans/plan-01.json`, `plans/plan-02.json`, `archive/plan-03.json`, 9 sections (01-09), `ab-tests/test-01.md`. Timeout sering terjadi; retry focused untuk sisa yang kurang.
-21. **Post-fix re-QA wajib.** Kalau QA report flag `NEEDS_FIX` lalu fix diapply secara manual (di luar fixer loop otomatis), wajib re-run QA untuk step tersebut + update `state.json` dan `manifest.json`. Tanpa re-QA, run stuck di status `NEEDS_FIX` meskipun semua issue udah resolved. Pattern dari Alpha Propolis: 3 critical issue difix, tapi `state.json` masih `NEEDS_FIX` karena re-QA gak pernah jalan.
+21. **Post-fix re-QA wajib.** Kalau QA report flag `NEEDS_FIX` lalu fix diapply secara manual (di luar fixer loop otomatis), wajib re-run QA untuk step tersebut + update `state.json` dan `manifest.json`. Tanpa re-QA, run stuck di status `NEEDS_FIX` meskipun semua issue udah resolved. Pattern dari Alpha Propolis: 3 critical issue difix, tapi `state.json` masih `NEEDS_FIX` karena re-QA gak pernah jalan. **Verification tool:** `scripts/qa-script.py <run_dir> --json` bisa dipake sebagai quick check sebelum re-QA formal. Kalau script bilang PASS, tinggal update state.json.
 22. **Stat cascade detection.** Stat tanpa sumber di step awal (05) bisa propagasi ke step downstream (07, 08) tanpa terdeteksi. QA Step 09 harus trace balik origin setiap stat. Cara cegah: kalau stat gak punya sumber di Step 05, tandai `[BUTUH DATA]` dan jangan dipake di LP.
 23. **Dose economics validation.** Klaim penghematan biaya di LP (misal "Rp X/bulan untuk keluarga") harus dicek dengan perhitungan dosis dari brief. 1 botol 10ml ≈ 200 tetes ÷ (6 tetes × 3x/hari × N orang) = realistis? Kalau gak match, klaim bisa misleading.
 24. **Multi-segment runs wajib isolated.** Kalau user minta beberapa target/segmen, treat `1 segment = 1 run folder + 1 claim/value prop set + 1 LP package`. Jangan campur claim, CTA, role review, atau positioning antar segmen. Kalau user bilang “jangan campur-campur” / “masing-masing claim target”, ini adalah hard constraint.
 25. **Designer/Stitch handoff is a first-class artifact.** Kalau user minta prompt LP dilempar ke Stitch/designer, final package wajib punya `08-lp/stitch-design-brief.md`, `stitch-prompt-primary.md`, dan `stitch-prompt-challenger.md` per segmen. Jangan cuma sebut prompt di chat.
-26. **Target-role review loop per LP sebelum lanjut segmen berikutnya.** Setelah Step 08, simulate reviewer roles khusus segmen, score, buat `change-list.md`, implement revisi ke LP + Stitch prompt, tulis `implemented-changes.md`, baru lanjut.
+26. **LP HTML wajib lolos 8-point check sebelum deploy.** Jalankan `scripts/qa-script.py` untuk scan 8 pola bermasalah: unverified stats, dose economics, fake scarcity, missing disclaimer, contradictory claims, WhatsApp placeholder, unverified clinical claims, stat cascade. Script output JSON yang bisa dikonsumsi agent-09-lite atau dipake sebagai standalone pre-deploy gate.
+27. **Redundancy check sebelum execute.** Kalau bikin list todo/plan untuk user, CEK DULU apakah ada item yang overlap atau redundant. User koreksi: "cek ulang ada yang redundant atau overlap ga?" — jangan langsung execute tanpa review. Pattern: tulis list → scan untuk overlap → merge → baru execute. Contoh: 7 items bisa jadi 4 kalau di-merge dengan benar.
+28. **Target-role review loop per LP sebelum lanjut segmen berikutnya.** Setelah Step 08, simulate reviewer roles khusus segmen, score, buat `change-list.md`, implement revisi ke LP + Stitch prompt, tulis `implemented-changes.md`, baru lanjut.
+27. **Post-QA batch fix pattern.** Kalau QA report bilang NEEDS_FIX, jangan fix satu-satu manual. Pakai pattern Scan → Fix → Verify dari `references/post-qa-batch-fix.md`. Scan dulu dengan regex untuk dapat exact file:line, batch fix dengan execute_code (re.sub / str.replace), final verify untuk pastikan zero issues remain. Contoh: 23 files, 30+ issues, <5 menit execution.
 27. **Relative `.hermes/...` path can nest outputs in the wrong run.** Subagents harus diberi absolute output path (`/home/ubuntu/.hermes/runs/...`) dan Final QA harus verify filesystem, bukan percaya summary. Jika cwd/session sudah menunjuk folder yang terhapus, file/terminal tools bisa error `FileNotFoundError`; recover dengan absolute-path sandbox or restart context.
-28. **JANGAN output LP cuma 1 file HTML self-contained.** Schema-08 lama cuma define `file_path: string` (1 file per variant). Ini memaksa agent jadi single-file. Output HARUS multi-file: `index.html` + `section/*.html` + `img/` + `style.css`. **NO `js/` folder. No JS files.** Lihat `references/lp-step-08-fix.md` untuk schema revised dan prompt patch.
-29. **Prompt 08 WAJIB define mandatory 12+ section framework.** Kalau prompt bilang "Jangan memaksa jumlah section" / "biarkan brief menentukan", agent output cuma 6 section (hero, problem, value, why, FAQ, CTA). Brief define 15 section di CRO Plan, tapi prompt override jadi "jangan dipaksa". Result: LP tipis, nggak persuasif, nggak ada scroll retention. WAJIB: 12+ section terpisah, masing-masing di file sendiri. Lihat `references/lp-step-08-fix.md` untuk mandatory section table.
-30. **Prompt 08 WAJIB include Direct Response Copywriter + Behavioral Economist roles.** Role lama cuma UI/UX + Frontend = fokus visual hierarchy, nggak persuasion. Tambah role: Senior Direct Response Copywriter (arsitektur persuasi, emotional journey, objection handling) + Behavioral Economist (nudge, scarcity, social proof, cognitive bias ethical). Lihat `references/lp-step-08-fix.md` untuk role definition.
-31. **QA Step 09 WAJIB cek persuasion completeness.** Selain schema compliance, QA harus verify: semua CRO plan section ada di LP, emotional arc (pain→agitation→solution→proof→CTA), objection handling (≥3), social proof (testimonial + stat), risk reversal (guarantee visible), genuine urgency (bukan fake), multi-file structure, image prompts exist, tracking placeholder exist. Kalau salah satu kurang = QA FAIL.
+29. **Scan-then-fix pattern untuk post-QA repair.** Kalau user bilang "find the problem and fix it" atau "apa yang salah?", JANGAN langsung propose fix. Scan dulu SEMUA file HTML di `08-lp/` dengan regex patterns (Math.random, wa.me/[^0-9], unverified %, tanpa efek samping, teruji klinis, missing disclaimer). Present findings sebagai exact file:line + context snippet. Group ke batch (blocking/high/post-launch). Baru eksekusi fix setelah user approve. Lihat `references/post-qa-repair-pattern.md` untuk full pattern.
+30. **JANGAN output LP cuma 1 file HTML self-contained.** Schema-08 lama cuma define `file_path: string` (1 file per variant). Ini memaksa agent jadi single-file. Output HARUS multi-file: `index.html` + `section/*.html` + `img/` + `style.css`. **NO `js/` folder. No JS files.** Lihat `references/lp-step-08-fix.md` untuk schema revised dan prompt patch.
+- Kalau salah satu missing, agent-08 tidak bisa jalan. Musti turun ke step yang menghasilkan file missing itu.
+
+---
 
 ## File References
 
@@ -378,6 +420,13 @@ Plan ke-3+ masuk `07-cro/archive/` dan bisa di-activate manual.
 | Multi-segment isolation | `references/multi-segment-isolation-and-recovery.md` | Lessons from 6-segment LP run: absolute paths, no claim mixing, Stitch handoff files, role-review loop, recovery from nested relative-path outputs |
 | Delivering artifacts | `references/delivering-artifacts.md` | Workflow: gather LP files, package into ZIP, send to Telegram via `send_message` with `MEDIA:` prefix. Python `zipfile` fallback, file naming conventions, and HTML delivery notes. |
 | LP Step 08 Fix | `references/lp-step-08-fix.md` | Patch notes: multi-file schema, persuasion framework, mandatory 12+ section table, prompt role additions, QA completeness checklist. Apply when fixing Step 08 output. |
+| LP Revision Entry Points | `references/lp-revision-entry-points.md` | Decision matrix: where to start when fixing an existing LP. Covers 3 entry points (Step 08 rebuild, NEEDS_FIX re-QA, and external LP deep-dive) with artifact dependency checklist. |
+| Batch Rebuild Workflow | `references/rebuild-batch-workflow.md` | Mass-rebuild Step 07 + Step 08 across multiple existing runs. Pre-flight checklist, batch dispatch strategy, constraint compliance verification, post-rebuild validation script. |
+| Web Deployment | `devops/ngegas-web-ops` skill | Deploy finished LP variants to ngegas.biz.id. Covers replace-existing pattern, backup-before-deploy, Caddyfile config, post-deploy curl verification. Use when user says "deploy to ngegas" or "upload to ngegas". |
+| **QA Step 09 Optimization** | `references/qa-step-09-optimization.md` | Chunked audit pattern untuk batch QA. Root cause analysis timeout, pre-compress phase, schema-09-lite, token savings 94%. Includes dispatch strategy (max 3 concurrent, timeout handling, fallback). |
+| **Post-QA Batch Fix** | `references/post-qa-batch-fix.md` | Scan → Fix → Verify workflow untuk memperbaiki NEEDS_FIX issues secara batch. Common patterns: unverified stats, dose economics, disclaimer injection, WhatsApp placeholder. |
+| **Post-QA Repair Pattern** | `references/post-qa-repair-pattern.md` | Scan-then-fix workflow: grep LP files for known issues (fake scarcity, placeholders, unverified claims), present exact file:line findings, group by severity batch, execute fixes, re-QA. |
+| Skill maintenance | `references/skill-maintenance.md` | Checklist: 6 SKILL.md locations to sync when pipeline.yaml changes. Impact assessment framework, patch doc format, pending items policy. |
 
 ## Usage
 

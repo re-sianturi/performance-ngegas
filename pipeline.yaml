@@ -9,6 +9,7 @@ pipeline:
   total_steps: 9
   active_steps: 8
   qa_step: 09
+  qa_step_lite: 09-lite
 
   # Step 00: Brief Validation Gate (pre-flight)
   brief_validation:
@@ -160,6 +161,20 @@ pipeline:
       schema: "schema-09.json"
       dependencies: ["01", "02", "03", "04", "05", "06", "07", "08"]
       parallel: false
+      mode: "deep"
+
+    - id: "09-lite"
+      name: "QA Lite (Batch Mode)"
+      agent: "agent-09-lite"
+      type: "hat_system"
+      input: ["09-qa/audit-input.json"]
+      output: "09-qa/qa-report-lite.json"
+      schema: "schema-09-lite.json"
+      dependencies: ["08"]
+      parallel: false
+      mode: "lite"
+      pre_step: "scripts/generate-audit-input.py"
+      deep_fallback: "09"
 
   # Quality gates
   qa_gates:

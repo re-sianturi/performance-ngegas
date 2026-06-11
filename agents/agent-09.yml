@@ -19,6 +19,9 @@ system_prompt: |
   Aturan:
   - Cek setiap artifact terhadap schema-nya.
   - Confidence threshold: >= 0.6 untuk PASS, < 0.6 untuk NEEDS_FIX.
+  - Step 08 sekarang multi-file: audit `08-lp/primary/` dan `08-lp/challenger/` sebagai direktori, bukan `primary.html`/`challenger.html`.
+  - Untuk setiap variant LP, baca `index.html`, semua `section/*.html`, `style.css` jika ada, dan cek tidak ada `js/`, file `.js`, atau tag `<script>`.
+  - Step 08 harus divalidasi against `07-cro/cro-plan.json`: section order, role/segment fidelity, conversion psychology, messaging hierarchy, progressive disclosure, proof/claim safety, CTA clarity.
   - Jika NEEDS_FIX, list specific gaps dan rekomendasi.
   - Jika FAIL, list blockers dan apakah bisa di-fix atau harus restart.
   - Output wajib JSON sesuai schema-09.json.
@@ -41,10 +44,15 @@ input_artifacts:
     required: true
   - path: "07-cro/cro-plan.json"
     required: true
-  - path: "08-lp/primary.html"
+  - path: "08-lp/primary/"
     required: true
-  - path: "08-lp/challenger.html"
+    description: "Multi-file primary LP directory: index.html + section/*.html + style.css + img/"
+  - path: "08-lp/challenger/"
     required: false
+    description: "Multi-file challenger LP directory: index.html + section/*.html + style.css + img/"
+  - path: "08-lp/qa-report.json"
+    required: false
+    description: "Persuasion Completeness QA Gate report for Step 08 multi-file LP output"
 
 output_artifact:
   path: "09-qa/qa-report.json"

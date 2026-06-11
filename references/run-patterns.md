@@ -89,3 +89,68 @@ delegate_task(...)  # 06b (tidak parallel, blocking)
 | 07 | Hat System | 470K in / 31K out | Paling berat — 9 sections + 3 plans |
 | 08 | Hat System | 470K in / 31K out | Baca semua sections + plans → HTML |
 | 09 | QA | 760K in / 14K out | Baca semua 8 artifact + 7 schema |
+
+## Step 09 QA Optimization — Chunked Audit Pattern
+
+**Problem:** Step 09 QA baca semua artifact 00-08 (118 KB+) lalu generate report lengkap dengan red_team_findings per step. Subagent timeout (600s) atau max_iterations karena context overload.
+
+**Root Cause:**
+1. Artifact bloat: 52 KB steps 00-07 + 66 KB LP files = 118 KB per run
+2. Redundant reads: Tiap subagent baca SEMUA file 00-07 untuk tiap run
+3. Schema over-spec: schema-09 requires `minItems: 8` step_audits + detailed red_team_findings
+4. No chunking: Single write untuk report 8K+ bytes
+
+**Solution — Chunked QA Pattern:**
+
+### Phase 1: Pre-Compress (Orchestrator)
+Generate `09-qa/audit-input.json` yang isinya extracted key data only:
+- Metadata run (brief_hash, segment, timestamp)
+- CRO Plan highlights (selected plans, section order, key messaging)
+- LP structure summary (variant names, section files count, word count)
+- Critical checkpoints (BPOM presence, disclaimer presence, fake scarcity check)
+
+Size: ~5 KB (dari 118 KB)
+
+### Phase 2: Lightweight QA (Subagent)
+Subagent baca `audit-input.json` + `schema-09-lite.json` (tanpa red_team_findings mandatory):
+- PASS/FAIL/NEEDS_FIX per variant
+- Confidence score
+- Critical issues only (blocking deployment)
+- Skip deep red team audit (bisa di-run terpisah kalau user minta)
+
+### Phase 3: Deep Audit (Optional)
+Kalau user minta full Red Team audit, jalanin terpisah dengan scope reduced:
+- 1 run at a time (bukan batch 3-4)
+- 1 variant at a time (primary dulu, challenger terpisah)
+- Pre-filter: cuma baca step yang ada red flags di Phase 1
+
+**Schema-09-lite fields:**
+```json
+{
+  "metadata": {...},
+  "variant_audits": [
+    {
+      "variant": "primary|challenger",
+      "status": "PASS|NEEDS_FIX|FAIL",
+      "confidence": 0.0-1.0,
+      "critical_issues": [...],
+      "blocking": boolean
+    }
+  ],
+  "overall_status": "PASS|NEEDS_FIX|FAIL",
+  "fix_recommendations": [...]
+}
+```
+
+**When to use full vs lite:**
+| Situasi | Schema | Notes |
+|---------|--------|-------|
+| Batch QA banyak run (4+) | Lite | Speed, no timeout |
+| Single run, user minta deep audit | Full | Complete red_team_findings |
+| QA gate sebelum deploy | Lite | Blocking issues only |
+| Post-mortem / compliance audit | Full | Complete traceability |
+
+**Token savings:**
+- Full schema-09: ~760K in / 14K out per run
+- Lite schema-09: ~45K in / 3K out per run
+- Batch 4 runs: 3.04M → 180K (94% reduction)
