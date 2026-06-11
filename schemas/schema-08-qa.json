@@ -1,0 +1,270 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Persuasion Completeness QA Report",
+  "description": "Output schema for Step 08-qa: Persuasion Completeness QA Gate. Validates Step 08 LP output against CRO Plan and persuasion completeness rules.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "overall_status",
+    "summary",
+    "checks",
+    "scores",
+    "findings",
+    "fix_recommendations"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "step",
+        "agent",
+        "timestamp",
+        "brief_hash",
+        "target_lp_path",
+        "cro_plan_reference"
+      ],
+      "properties": {
+        "step": {
+          "type": "string",
+          "enum": ["08-qa"]
+        },
+        "agent": {
+          "type": "string",
+          "enum": ["agent-08-qa"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "brief_hash": {
+          "type": "string"
+        },
+        "target_lp_path": {
+          "type": "string",
+          "description": "Path to the LP output being validated (e.g., 08-lp/)"
+        },
+        "cro_plan_reference": {
+          "type": "string",
+          "description": "Path to the CRO Plan used as source of truth (e.g., 07-cro/cro-plan.json)"
+        }
+      }
+    },
+    "overall_status": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "NEEDS_FIX",
+        "FAIL"
+      ],
+      "description": "PASS = all checks >= 0.8, no auto-fail. NEEDS_FIX = some checks < 0.8 but fixable. FAIL = auto-fail triggered or critical breach."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable summary of the QA result. What passed, what failed, and why."
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "description": "7-point persuasion completeness checks. Each check must score 0.0-1.0. Any check < 0.8 triggers fixer loop.",
+      "items": {
+        "type": "object",
+        "required": [
+          "check_id",
+          "check_name",
+          "score",
+          "passed",
+          "details"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7
+          },
+          "check_name": {
+            "type": "string",
+            "enum": [
+              "Section Order Integrity",
+              "Conversion Psychology Visual Execution",
+              "Messaging Hierarchy Presence",
+              "CRO Plan Strategy Fidelity",
+              "Progressive Disclosure",
+              "No JS Folder",
+              "Max 2 Variants"
+            ]
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Score 0.0-1.0. < 0.8 = trigger fixer loop (max 2 retries)."
+          },
+          "passed": {
+            "type": "boolean",
+            "description": "true if score >= 0.8 AND no auto-fail condition for this check."
+          },
+          "auto_fail": {
+            "type": "boolean",
+            "description": "true if this check triggered an auto-fail condition (e.g., js/ folder found, missing section). Overrides score.",
+            "default": false
+          },
+          "details": {
+            "type": "string",
+            "description": "Specific evidence for this check: what was verified, what was missing, file paths checked, etc."
+          }
+        }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "required": [
+        "overall",
+        "min_check",
+        "average"
+      ],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall score, typically the minimum of all check scores if any auto-fail exists, otherwise average."
+        },
+        "min_check": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Lowest score among all 7 checks."
+        },
+        "average": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Average of all 7 check scores."
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Specific findings, issues, or evidence discovered during QA. One item per notable finding.",
+      "items": {
+        "type": "object",
+        "required": [
+          "severity",
+          "category",
+          "message"
+        ],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "major",
+              "minor",
+              "info"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "missing_section",
+              "wrong_order",
+              "missing_psychology",
+              "missing_messaging",
+              "cro_mismatch",
+              "missing_progressive_disclosure",
+              "js_found",
+              "variant_overflow",
+              "structure_error",
+              "other"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the finding."
+          },
+          "file_path": {
+            "type": "string",
+            "description": "Path to the file where the issue was found, if applicable."
+          },
+          "expected": {
+            "type": "string",
+            "description": "What was expected per CRO Plan or spec."
+          },
+          "actual": {
+            "type": "string",
+            "description": "What was actually found."
+          }
+        }
+      }
+    },
+    "fix_recommendations": {
+      "type": "array",
+      "description": "Actionable recommendations for the fixer agent to resolve NEEDS_FIX status.",
+      "items": {
+        "type": "object",
+        "required": [
+          "priority",
+          "check_id",
+          "recommendation"
+        ],
+        "properties": {
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3,
+            "description": "1 = must fix (auto-fail), 2 = should fix (score < 0.8), 3 = nice to fix (score >= 0.8 but could improve)."
+          },
+          "check_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7,
+            "description": "Which check this recommendation targets."
+          },
+          "recommendation": {
+            "type": "string",
+            "description": "Specific action to take. E.g., 'Add missing section/urgency.html matching CRO Plan recommended_section_order', 'Remove js/ folder', 'Rewrite hero copy to include primary messaging from messaging_hierarchy.primary'."
+          },
+          "target_file": {
+            "type": "string",
+            "description": "File path to modify, if applicable."
+          }
+        }
+      }
+    },
+    "auto_fail_conditions": {
+      "type": "array",
+      "description": "List of which auto-fail conditions were evaluated and their result. All 7 conditions must be checked.",
+      "items": {
+        "type": "object",
+        "required": [
+          "condition",
+          "triggered",
+          "evidence"
+        ],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "enum": [
+              "js_folder_exists",
+              "missing_section_from_cro_plan",
+              "variant_count_exceeds_2",
+              "primary_variant_missing",
+              "challenger_variant_missing",
+              "index_html_missing",
+              "cro_plan_not_referenced"
+            ]
+          },
+          "triggered": {
+            "type": "boolean",
+            "description": "true if this auto-fail condition was found."
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Path or description of the evidence."
+          }
+        }
+      }
+    }
+  }
+}
